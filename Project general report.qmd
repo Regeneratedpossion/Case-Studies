@@ -1,0 +1,172 @@
+---
+title: "Project1"
+format: pdf
+number-sections: true
+editor: visual
+---
+
+# Description of the problem
+
+## Type of data collection
+
+| y_a1 | y_a2 | ... | y_a24 | y_b1 | y_b2 | ... | y_b24 | W   | H   | D   | S   |
+|------|------|-----|-------|------|------|-----|-------|-----|-----|-----|-----|
+| 0.12 | 0.45 | ... | 0.78  | 0.23 | 0.56 | ... | 0.89  | Mon | 3   | 15  | 1.2 |
+| 0.34 | 0.67 | ... | 0.91  | 0.45 | 0.12 | ... | 0.34  | Tue | 2   | 22  | 0.8 |
+| 0.56 | 0.23 | ... | 0.45  | 0.78 | 0.34 | ... | 0.56  | Wed | 4   | 7   | 1.5 |
+| ...  | ...  | ... | ...   | ...  | ...  | ... | ...   | ... | ... | ... | ... |
+
+where - $y_{ai}$ is the power comsumption in the ith hour within the ath day, $i=1,...,24$
+
+-   $y_{bj}$ is the the power comsumption in the jth hour within the bth weekday,$j=1,..,24$
+
+-   W:weekday,H:Household,D:Day,S:Seasonal
+
+## Variables Description
+
+-   type and size of the sample
+
+-   Sample Space $\{W,H\}$
+
+where， W:weekday, factors with levels 1,2,3...7, for example W=1 is monday,
+
+-   H:household,facotr with levels 1,...,33
+
+-   D:day, e.g D: 1st January
+
+-   S:sinusoidal seasonal term,$\displaystyle \sin\!\Bigl(\frac{2\pi}{T}\,(t -\varphi)\Bigr)$,
+
+where $T=365$,
+
+$\varphi=31+28+21=80$, that we considered the first three months as a cycle,then repeated this period in the inusoidal seasonal function, which is $\sin\left( \frac{D - 31 - 28 - 21}{365} \cdot 2\pi \right)$
+
+# Statistical methods
+
+## Missing Data
+
+### Linear Interpolation
+
+## The way of smoothing
+
+## Modeling method
+
+### Multiivariate Linear Model
+
+Sample Space:$y_a=cbind(y_{a1},...,y_{a24})$,$y_a=cbind(y_{b1},...,y_{b24})$
+
+Additive model without interactions:$$y_a \sim W + H + S$$,$Y=\{y_{a},y_{b}\}\in \mathcal{R}^{365 \times 96}$
+
+Multication with interactions:$$y_a \sim W * H * S$$,$Y=\{y_{a},y_{b}\}\in \mathcal{R}^{365 \times 96}$
+
+### Parameter Estimation
+
+Assume that we have the sample $y_{n}=(y_{a1_{n}},...,y_{a24_{n}})^T$=$y_{n}=(y_{n}^{(1)},...,y_{n}^{(24)})^T$,
+
+where n is the weekday of nth day, $n=1,...$, $N=365*30$
+
+We can estimate the parameter by OLS,$$\hat{\theta}_i = (X^T X)^{-1} X^T y^{(i)}$$
+
+## Multivariate Time Series Model
+
+### Data Representation
+
+The observation vector $y$ consists of $N$ time points with 24-dimensional observations: $$
+y = \begin{pmatrix} y_1^T \\ \vdots \\ y_N^T \end{pmatrix} 
+= \Big(y^{(1)}, \ldots, y^{(24)}\Big)
+$$
+
+### Model Structure
+
+$$
+y = X \cdot \Theta + Z
+$$ where: - **Parameter space**: $\Theta = \begin{pmatrix} \theta_1 & \cdots & \theta_{24} \end{pmatrix}$ - **Design matrix**: $X$ ($N \times p$) - **Noise term**: $Z = \Big(z^{(1)}, \ldots, z^{(24)}\Big)$
+
+### Component Form
+
+For each time point $t$: $$
+y_t = X_t \cdot \begin{pmatrix} \theta_1 \\ \vdots \\ \theta_{24} \end{pmatrix} + z_t
+$$
+
+### Notation Guide
+
+| Symbol     | Dimension    | Description                          |
+|------------|--------------|--------------------------------------|
+| $y^{(k)}$  | $N \times 1$ | Observation sequence for feature $k$ |
+| $\theta_k$ | $p \times 1$ | Parameter vector for feature $k$     |
+| $z^{(k)}$  | $N \times 1$ | Noise term for feature $k$           |
+
+## Statistic Test
+
+### MANOVA
+
+Before we use multilevel statistic test. there are some assumptions needed to be checked：
+
+1.  **Multivariate normality**\
+    $$E_i \sim N_p(0, \Sigma), \quad i=1,\dots,n$$\
+    Each residual vector is drawn from the same *p*-variate normal distribution.
+
+2.  **Independence**\
+    The residuals $E_i$ are mutually independent and identically distributed.
+
+3.  **Homoscedasticity**\
+    The covariance matrix ($\Sigma$) is constant across all observations and under both the full and reduced models.
+
+4.  **Full‑rank design matrix**\
+    ($\mathrm{rank}(X) = q$), ensuring the parameter matrix (B) is identifiable and ($\widehat{\Sigma}$) is invertible.
+
+5.  **Correct model specification**\
+    The true relationship follows\
+    $$
+    Y = X \Theta + Z,
+    $$\
+    and any linear constraints under (H_0) are correctly specified.
+
+## Multivariate Linear Model, MLM
+
+### test statistics
+
+This part describes the transition from univariate hypothesis testing to multivariate hypothesis testing, and demonstrates how to apply multivariate test statistics (Roy's Largest Root, Lawley–Hotelling Trace, Pillai's Trace, Wilks' Lambda) to a dataset with 48 response variables. The goal is to perform significance testing based on these statistics.
+
+### Data Structure and Notation
+
+-   Let (N) denote the sample size.
+-   The 48 response variables are organized as: $Y = [, y_{a1}, \dots, y_{a24},; y_{b1}, \dots, y_{b24} ,] \in \mathbb{R}^{N\times48}$
+-   The covariates (including intercept) form the design matrix: $X = [\mathbf{1},; W,; H,; D,; S] \in \mathbb{R}^{N\times p},\quad p=5.$
+-   The reduced model includes only the intercept: $X_0 = \mathbf{1}_N \in \mathbb{R}^{N\times1}.$
+
+## Detailed Methods
+
+### Univariate F-Test
+
+1.  **Model:** \$H_0:; y = X_0\\beta_0 + \\varepsilon \\quad \\text{vs.} \\quad H_1:; y = X\\beta + \\varepsilon, \$ where $y \in \mathbb{R}^N$.
+
+2.  **Projection matrices:** $P_0 = X_0(X_0\top X_0){-1}X_0^\top,\quad P = X(X\top X){-1}X^\top.$
+
+3.  **Sum of Squares:** $\mathrm{SSR} = y^\top(P - P_0)y,\quad \mathrm{SSE} = y^\top(I - P)y.$
+
+4.  **F-statistic:** $F = \frac{\mathrm{SSR}/(p-1)}{\mathrm{SSE}/(N-p)} \sim F_{p-1,,N-p}.$
+
+### Multivariate Hypothesis Testing
+
+#### Projection and Sum of Squares Matrices
+
+-   Using the same projection matrices (P) and (P_0) from above.
+-   Define:$H = Y^\top(P - P_0)Y,\quad E = Y^\top(I - P)Y.$
+
+#### Eigenvalue Decomposition
+
+-   Compute the matrix: $A = H E^{-1}.$
+-   Obtain eigenvalues $\{\lambda_i\}_{i=1}^r$ where$r=\min(p-1,\,48)$
+
+#### Multivariate Test Statistics
+
+-   **Roy's Largest Root:** Focuses on the strongest signal direction.
+-   **Lawley–Hotelling Trace:** Aggregates the overall multivariate signal strength.
+-   **Pillai's Trace:** Sums the explained proportion of each dimension.
+-   **Wilks' Lambda:** Measures the proportion of unexplained variation.
+
+### Connection to Univariate Testing
+
+-   When (q=1), (H) and (E) reduce to scalars, and all four statistics simplify to the classical univariate F-statistic.
+
+### AIC
